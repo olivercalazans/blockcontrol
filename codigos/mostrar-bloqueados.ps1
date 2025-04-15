@@ -1,6 +1,8 @@
 $nomeDoArquivo = $args[0] + "-bloqueados.txt"
-$caminho       = Join-Path -Path $PSScriptRoot -ChildPath $nomeDoArquivo
+$caminho       = "$PSScriptRoot\$nomeDoArquivo"
 $dados         = Get-Content -Path $caminho
+
+Write-Host "MOSTRANDO DADOS DE UM ARQUIVO EXTERNO"
 
 foreach ($linha in $dados) {
     $partes     = $linha -split ","

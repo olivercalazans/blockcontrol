@@ -44,33 +44,37 @@ do {
 	    # Domínios Blocklist
 	    '11'{
 			Write-Host "`nListando dominios em blocklist..."
-			Get-SenderFilterConfig | select -ExpandProperty blockeddomainsandsubdomains | sort | Out-Host
+			. "$PSScriptRoot\mostrar-bloqueados.ps1" "dominios"
 		}
 		
 		'12'{
 			$entrada = Read-Host "`nDominio a adicionar (formato: meuspam.com)"
-			Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Add="$entrada"} | Out-Host 
+			Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Add="$entrada"} | Out-Host
+			. "$PSScriptRoot\adicionar-bloqueado.ps1" "dominios" "$entrada"
 		}
 
 		'13'{
 			$entrada = Read-Host "`nDominio a remover (formato: meuspam.com)"
-			Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Remove="$entrada"} | Out-Host  
+			Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Remove="$entrada"} | Out-Host
+			. "$PSScriptRoot\remover-bloqueado.ps1" "dominios" "$entrada"
 		}
   
 	    # E-mails Blocklist
 	    '21'{
 			$entrada = Write-Host "`nListando e-mails em blocklist..."
-			Get-SenderFilterConfig | select -ExpandProperty BlockedSenders | select Address	| sort | Out-Host  
+			. "$PSScriptRoot\mostrar-bloqueados.ps1" "emails"
 		}	
 
 		'22'{
 			$entrada = Read-Host "`nE-mail a adicionar na blocklist (formato: jdoe@gmail.com)"
 			Set-SenderFilterConfig -BlockedSenders @{Add="$entrada"}
+			. "$PSScriptRoot\adicionar-bloqueado.ps1" "emails" "$entrada"
 		}	
 
 	    '23'{
 			$entrada = Read-Host "`nE-mail a remover da blocklist (formato: jdoe@gmail.com)"
 			Set-SenderFilterConfig -BlockedSenders @{Remove="$entrada"}
+			. "$PSScriptRoot\remover-bloqueado.ps1" "emails" "$entrada"
 		}	
 		
 		# Sair
