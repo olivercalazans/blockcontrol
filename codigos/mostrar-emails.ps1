@@ -1,8 +1,9 @@
-Write-Host "Script iniciado"
+$caminho = Join-Path -Path $PSScriptRoot -ChildPath "emails-bloqueados.txt"
+$emails  = Get-Content -Path $caminho
 
-. "C:\Users\3420179\codigos\emails-bloqueados.ps1"
-
-foreach ($email in $emailsBloqueados.Keys) {
-    Write-Host "$email => $($emailsBloqueados[$email])"
-    Write-Host "oi"
+foreach ($linha in $emails) {
+    $emailData = $linha -split ","
+    $email     = $emailData[0]
+    $data      = $emailData[1]
+    Write-Host "$email - $data"
 }
