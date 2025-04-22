@@ -49,8 +49,11 @@ do {
 		
 		'12'{
 			$entrada = Read-Host "`nDominio a adicionar (formato: meuspam.com)"
+			Write-Host "Verificando se o dimínio foi bloqueado. Aguarde."			
 			Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Add="$entrada"} | Out-Host
 			. "$PSScriptRoot\adicionar-bloqueado.ps1" "dominios" "$entrada"
+			$blockedDomain = Get-SenderFilterConfig | Select-Object -ExpandProperty blockeddomainsandsubdomains | Select-String "$entrada"
+			Write-Host "O domínio $blockedDomain foi bloqueado"
 		}
 
 		'13'{
@@ -67,8 +70,11 @@ do {
 
 		'22'{
 			$entrada = Read-Host "`nE-mail a adicionar na blocklist (formato: jdoe@gmail.com)"
+			Write-Host "Verificando se o email foi bloqueado"
 			Set-SenderFilterConfig -BlockedSenders @{Add="$entrada"}
 			. "$PSScriptRoot\adicionar-bloqueado.ps1" "emails" "$entrada"
+			$blockedEmail = Get-SenderFilterConfig |  Select-Object -ExpandProperty BlockedSenders | Select-Object -ExpandProperty Address | Select-String "$entrada"
+			Write-Host "O email $blockedEmail foi bloqueado"
 		}	
 
 	    '23'{
