@@ -26,15 +26,15 @@ do {
 	    '1' {
 			Write-Host "`nListando IPs..."
 			Get-IPBlockListEntry
-	    }
+	       }
 	    '2'{
 			$entrada = Read-Host "`nIP a adicionar (formato: 1.2.3.4)"
 			Add-IPBlockListEntry -IPAddress $entrada | Out-Host		 
-	    }
+	       }
 	    '3'{
 			$entrada = Read-Host "`nCIDR a adicionar (formato: 1.2.3.0/24)"
 			Add-IPBlockListEntry -IPRange $entrada	| Out-Host	 
-	    }
+	       }
 	    '4'{
 			$entrada = Read-Host "`nIP a remover (formato: 1.2.3.4)"
 			Write-Host "Removendo IP/CIDR $entrada..."
@@ -46,8 +46,7 @@ do {
 			Write-Host "`nListando dominios em blocklist..."
 			. "$PSScriptRoot\mostrar-bloqueados.ps1" "dominios"
 		}
-		
-		'12'{
+	    '12'{
 			$entrada = Read-Host "`nDominio a adicionar (formato: meuspam.com)"
 			Write-Host "Verificando se o dimínio foi bloqueado. Aguarde."			
 			Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Add="$entrada"} | Out-Host
@@ -55,8 +54,7 @@ do {
 			$blockedDomain = Get-SenderFilterConfig | Select-Object -ExpandProperty blockeddomainsandsubdomains | Select-String "$entrada"
 			Write-Host "O domínio $blockedDomain foi bloqueado"
 		}
-
-		'13'{
+	    '13'{
 			$entrada = Read-Host "`nDominio a remover (formato: meuspam.com)"
 			Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Remove="$entrada"} | Out-Host
 			. "$PSScriptRoot\remover-bloqueado.ps1" "dominios" "$entrada"
@@ -67,8 +65,7 @@ do {
 			$entrada = Write-Host "`nListando e-mails em blocklist..."
 			. "$PSScriptRoot\mostrar-bloqueados.ps1" "emails"
 		}	
-
-		'22'{
+	    '22'{
 			$entrada = Read-Host "`nE-mail a adicionar na blocklist (formato: jdoe@gmail.com)"
 			Write-Host "Verificando se o email foi bloqueado"
 			Set-SenderFilterConfig -BlockedSenders @{Add="$entrada"}
@@ -76,15 +73,13 @@ do {
 			$blockedEmail = Get-SenderFilterConfig |  Select-Object -ExpandProperty BlockedSenders | Select-Object -ExpandProperty Address | Select-String "$entrada"
 			Write-Host "O email $blockedEmail foi bloqueado"
 		}	
-
 	    '23'{
 			$entrada = Read-Host "`nE-mail a remover da blocklist (formato: jdoe@gmail.com)"
 			Set-SenderFilterConfig -BlockedSenders @{Remove="$entrada"}
 			. "$PSScriptRoot\remover-bloqueado.ps1" "emails" "$entrada"
 		}	
-		
 		# Sair
-		'0'{
+	     '0'{
 		   Return
 	    }
 	}
