@@ -1,0 +1,6 @@
+teste@mail,2025
+teste10@mail.com,25/04/2025 16:02:00
+teste11@mail.com,25/04/2025 16:02:25
+teste12@mail.com,25/04/2025 16:02:33
+teste2@mail,2025
+teste3@mail,2025
