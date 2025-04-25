@@ -2,7 +2,7 @@ Add-Type -AssemblyName System.Windows.Forms
 
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Command Outputs and Input"
-$form.Size = New-Object System.Drawing.Size(1300,400)
+$form.Size = New-Object System.Drawing.Size(1115,400)  # Adjusted the form width
 
 # Panel 1: Output of the first command
 $panel1 = New-Object System.Windows.Forms.Panel
