@@ -5,10 +5,10 @@ $arquivo          = "$PSScriptRoot\$nomeDoArquivo"
 $linhasFiltradas  = @()
 
 foreach ($linha in Get-Content $arquivo) {
-    if ($linha.Trim() -eq "") { continue }  # Ignora linhas em branco
+    if ($linha.Trim() -eq "") { continue }
     $partes = $linha -split ','
     
-    if ($partes.Length -lt 2) { continue }  # Ignora linhas mal formatadas (sem vírgula)
+    if ($partes.Length -lt 2) { continue }
     $email = $partes[0].Trim()
 
     if (![string]::IsNullOrWhiteSpace($email) -and $email.ToLower() -ne $linhaParaRemover.ToLower()) {
