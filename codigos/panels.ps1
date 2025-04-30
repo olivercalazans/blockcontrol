@@ -1,54 +1,47 @@
-# Panel 1
-$panel1 = New-Object System.Windows.Forms.Panel
-$panel1.Size = New-Object System.Drawing.Size(250,300)
-$panel1.Location = New-Object System.Drawing.Point(20,20)
-$panel1.BorderStyle = 'FixedSingle'
+function Create-Display-Panel {
+    param([int]$len)
+        $panel             = New-Object System.Windows.Forms.Panel
+        $panel.Size        = New-Object System.Drawing.Size(250,300)
+        $panel.Location    = New-Object System.Drawing.Point($len,20)
+        $panel.BorderStyle = 'FixedSingle'
 
-$box1 = New-Object System.Windows.Forms.TextBox
-$box1.Multiline = $true
-$box1.ScrollBars = 'Vertical'
-$box1.Dock = 'Fill'
-$panel1.Controls.Add($box1)
-$form.Controls.Add($panel1)
-
-
-# Panel 2
-$panel2 = New-Object System.Windows.Forms.Panel
-$panel2.Size = New-Object System.Drawing.Size(250,300)
-$panel2.Location = New-Object System.Drawing.Point(290,20)
-$panel2.BorderStyle = 'FixedSingle'
-
-$box2 = New-Object System.Windows.Forms.TextBox
-$box2.Multiline = $true
-$box2.ScrollBars = 'Vertical'
-$box2.Dock = 'Fill'
-$panel2.Controls.Add($box2)
-$form.Controls.Add($panel2)
+        $box = New-Object System.Windows.Forms.TextBox
+        $box.Multiline  = $true
+        $box.WordWrap   = $false
+        $box.ScrollBars = 'Both'
+        $box.Dock       = 'Fill'
+        $panel.Controls.Add($box)
+        $form.Controls.Add($panel)
+        return @{ 'panel' = $panel; 'box' = $box}
+}
 
 
-# Panel 3
-$panel3 = New-Object System.Windows.Forms.Panel
-$panel3.Size = New-Object System.Drawing.Size(250,300)
-$panel3.Location = New-Object System.Drawing.Point(560,20)
-$panel3.BorderStyle = 'FixedSingle'
+$result1 = Create-Display-Panel -len 20
+$panel1  = $result1['panel']
+$box1    = $result1['box']
 
-$box3 = New-Object System.Windows.Forms.TextBox
-$box3.Multiline = $true
-$box3.ScrollBars = 'Vertical'
-$box3.Dock = 'Fill'
-$panel3.Controls.Add($box3)
-$form.Controls.Add($panel3)
+$result2 = Create-Display-Panel -len 290
+$panel2  = $result2['panel']
+$box2    = $result2['box']
 
 
-# Panel 4 - Inputs Buttons
-$panel4 = New-Object System.Windows.Forms.Panel
-$panel4.Size = New-Object System.Drawing.Size(250,300)
-$panel4.Location = New-Object System.Drawing.Point(830,20)
-$panel4.BorderStyle = 'FixedSingle'
+$result3 = Create-Display-Panel -len 560
+$panel3  = $result3['panel']
+$box3    = $result3['box']
 
 
-# Panel 5 - Removal Inputs
-$panel5 = New-Object System.Windows.Forms.Panel
-$panel5.Size = New-Object System.Drawing.Size(250,300)
-$panel5.Location = New-Object System.Drawing.Point(1100,20)
-$panel5.BorderStyle = 'FixedSingle'
+
+
+function Create-Input-Panel {
+    param ([int]$len)
+    $panel = New-Object System.Windows.Forms.Panel
+    $panel.Size = New-Object System.Drawing.Size(250,300)
+    $panel.Location = New-Object System.Drawing.Point($len,20)
+    $panel.BorderStyle = 'FixedSingle'
+    return $panel
+    
+}
+
+
+$panel4 = Create-Input-Panel -len 830
+$panel5 = Create-Input-Panel -len 1100
