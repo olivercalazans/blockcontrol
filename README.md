@@ -1,4 +1,4 @@
-# blocklist-ifrn
+# BlockControl
 
 
 ## 🌐 English
