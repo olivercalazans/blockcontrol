@@ -1,5 +1,4 @@
-# BlockControl
-
+<h1 align="center"> BlockControl </h1>
 
 ## 🌐 English
 
