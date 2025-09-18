@@ -1,18 +1,19 @@
 <h1 align="center"> BlockControl </h1>
 
-## 🌐 English
+## 🇺🇸 English
 
-This set of scripts serves as an assistant for the Exchange email server, managing an external database containing blocked domains, email addresses, and malicious IPs. Since Exchange does not display detailed information such as the date and time of the block, the scripts were developed to log this data and track changes made to the server.
+This project is a graphical interface designed to simplify the management of blocked IP addresses, domains, and email addresses in Microsoft Exchange. Instead of using command-line operations, administrators can use the interface to easily block or unblock entries and view the current list of blocked items.
 
-Developed exclusively with PowerShell and using only the native .NET Framework on Windows, the system includes a main script that simplifies the addition and removal of entries directly in Exchange. After each operation, auxiliary scripts are automatically executed, leveraging the newly inserted data to keep the external database up to date.
+The tool was developed entirely with PowerShell, using only the native .NET Framework on Windows, and focuses solely on simplifying these operations without maintaining external logs or databases.
 
-This approach avoids task repetition and, in many cases, eliminates the need to manually search for blocked IPs, domains, or email addresses in the list.
+Its goal is to make the management of blocked entries more practical and accessible, avoiding the need to manually use PowerShell commands or navigate complex menus in the Exchange environment.
 
+<br>
 
 ## 🇧🇷 Português
 
-Este conjunto de scripts atua como um auxiliar para o servidor de e-mails Exchange, realizando o gerenciamento de uma base de dados externa contendo domínios, endereços de e-mail e IPs maliciosos bloqueados. Como o Exchange não exibe informações detalhadas, como data e hora do bloqueio, os scripts foram desenvolvidos para registrar essas informações e acompanhar as alterações realizadas no servidor.
+Este projeto é uma interface gráfica desenvolvida para simplificar o gerenciamento de IPs, domínios e endereços de e-mail bloqueados no Microsoft Exchange. Em vez de utilizar comandos em linha, o administrador pode usar a interface para bloquear ou desbloquear facilmente os itens, além de visualizar a lista atual de bloqueios.
 
-Desenvolvido exclusivamente com PowerShell e utilizando apenas a .NET Framework nativa do Windows, o sistema conta com um script principal que facilita a inclusão e exclusão de entradas diretamente no Exchange. Após cada operação, scripts auxiliares são executados automaticamente, aproveitando os dados recém-inseridos para manter a base externa atualizada.
+A ferramenta foi desenvolvida inteiramente em PowerShell, utilizando apenas a .NET Framework nativa do Windows, e tem como foco apenas facilitar essas operações — sem registrar logs, nem atualizar bases de dados externas.
 
-Dessa forma, evita-se a repetição de tarefas e, em muitos casos, a necessidade de buscar manualmente o IP, domínio ou e-mail bloqueado na lista.
+O objetivo é tornar a administração de bloqueios mais prática e acessível, evitando a necessidade de uso manual de comandos no PowerShell ou a navegação por menus complexos do ambiente Exchange.
