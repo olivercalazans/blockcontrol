@@ -215,14 +215,15 @@ $buttonRemove1.Add_Click({
 # Unblock domain
 $buttonRemove2.Add_Click({
     $inputRemove2 = $textBoxRemove2.Text
-    Handle-ButtonClick -InputText $inputRemove2 -Action { Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Remove="$inputRemove2"} | Out-Host } -SuccessMessage "Domain '$inputRemove2' has been removed"
+    Handle-ButtonClick -InputText $inputRemove2 -Action { Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Remove=$inputRemove2} | Out-Host } -SuccessMessage "Domain '$inputRemove2' has been removed"
 })
 
 # Unblock email
 $buttonRemove3.Add_Click({
     $inputRemove3 = $textBoxRemove3.Text
-    Handle-ButtonClick -InputText $inputRemove3 -Action { Set-SenderFilterConfig -BlockedSenders @{Remove="$inputRemove3"} } -SuccessMessage "Email '$inputRemove3' has been removed"
+    Handle-ButtonClick -InputText $inputRemove3 -Action { Set-SenderFilterConfig -BlockedSenders @{Remove=$inputRemove3} } -SuccessMessage "Email '$inputRemove3' has been removed"
 })
+
 
 
 
