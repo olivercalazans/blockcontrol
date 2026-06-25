@@ -1,231 +1,318 @@
-Add-Type -AssemblyName System.Windows.Forms
+Write-Host "`n# Repositório: https://github.com/olivercalazans/blockcontrol"
+Write-Host "A primeira execução é lenta pois o Exchange está iniciando o terminal" -ForegroundColor Green
 
-$form      = New-Object System.Windows.Forms.Form
-$form.Text = "Command Outputs and Input"
-$form.Size = New-Object System.Drawing.Size(895,430)
+function Read-NonEmptyInput {
+    param ( [string]$Message )
 
-$panel             = New-Object System.Windows.Forms.Panel
-$panel.Size        = New-Object System.Drawing.Size(300,300)
-$panel.Location    = New-Object System.Drawing.Point(20,20)
-$panel.BorderStyle = 'FixedSingle'
-
-$box = New-Object System.Windows.Forms.TextBox
-$box.Multiline  = $true
-$box.WordWrap   = $false
-$box.ScrollBars = 'Both'
-$box.Dock       = 'Fill'
-
-$panel.Controls.Add($box)
-$form.Controls.Add($panel)
-
-
-
-
-
-$buttonPanel             = New-Object System.Windows.Forms.Panel
-$buttonPanel.Size        = New-Object System.Drawing.Size(300,50)
-$buttonPanel.Location    = New-Object System.Drawing.Point(20,330)
-$buttonPanel.BorderStyle = 'FixedSingle'
-
-
-$btn1          = New-Object System.Windows.Forms.Button
-$btn1.Text     = "See IPs"
-$btn1.Size     = New-Object System.Drawing.Size(90,23)
-$btn1.Location = New-Object System.Drawing.Point(5,15)
-
-$btn2          = New-Object System.Windows.Forms.Button
-$btn2.Text     = "See Domains"
-$btn2.Size     = New-Object System.Drawing.Size(90,23)
-$btn2.Location = New-Object System.Drawing.Point(105,15)
-
-$btn3          = New-Object System.Windows.Forms.Button
-$btn3.Text     = "See Emails"
-$btn3.Size     = New-Object System.Drawing.Size(90,23)
-$btn3.Location = New-Object System.Drawing.Point(205,15)
-
-
-$buttonPanel.Controls.AddRange(@($btn1,$btn2,$btn3))
-$form.Controls.Add($buttonPanel)
-
-
-$displayBox = $box
-
-$btn1.Add_Click({
-    $displayBox.Text = (Get-IPBlockListEntry | ForEach-Object { $_.IPRange.Expression } | Sort-Object { [version]($_ -replace '/\d+', '') } | Out-String)
-})
-
-$btn2.Add_Click({
-    $displayBox.Text = (Get-SenderFilterConfig | Select-Object -ExpandProperty BlockedDomainsAndSubdomains | Sort-Object | Out-String)
-})
-
-$btn3.Add_Click({
-    $displayBox.Text = (Get-SenderFilterConfig | Select-Object -ExpandProperty BlockedSenders | Select-Object -ExpandProperty Address | Sort-Object | Out-String)
-})
-
-
-
-
-
-function Create-Input-Panel {
-    param ([int]$len)
-    $panel             = New-Object System.Windows.Forms.Panel
-    $panel.Size        = New-Object System.Drawing.Size(250,360)
-    $panel.Location    = New-Object System.Drawing.Point($len,20)
-    $panel.BorderStyle = 'FixedSingle'
-    return $panel
+    $inputValue = Read-Host $Message
     
+    if ([string]::IsNullOrWhiteSpace($inputValue)) {
+        Write-Host "Entrada vazía" -ForegroundColor Red
+        return $null
+    }
+    
+    return $inputValue
+}
+
+function Get-DomainList {
+    Get-SenderFilterConfig |
+        Select-Object -ExpandProperty BlockedDomainsAndSubdomains |
+        ForEach-Object { $_.ToString() } |
+        Sort-Object
+}
+
+function Get-EmailList {
+    Get-SenderFilterConfig | Select-Object -ExpandProperty BlockedSenders | Select-Object -ExpandProperty Address | Sort-Object
+}
+
+function Get-IPList {
+    Get-IPBlockListEntry | ForEach-Object { $_.IPRange.Expression } | Sort-Object { [version]($_ -replace '/\d+', '') }
 }
 
 
-function Create-Text-Box{
-    param([int]$len)
-        $textBoxInput          = New-Object System.Windows.Forms.TextBox
-        $textBoxInput.Size     = New-Object System.Drawing.Size(230,25)
-        $textBoxInput.Location = New-Object System.Drawing.Point(10,$len)
-        return $textBoxInput
-}
-
-
-function Create-Button {
-    param([string]$text, [int]$len)
-        $button          = New-Object System.Windows.Forms.Button
-        $button.Text     = $text
-        $button.Size     = New-Object System.Drawing.Size(130,25)
-        $button.Location = New-Object System.Drawing.Point(10,$len)
-        return $button
-}
-
-
-
-
-
-$panel2 = Create-Input-Panel -len 340
-
-
-# Input 1
-$textBoxInput1 = Create-Text-Box -len 10
-$panel2.Controls.Add($textBoxInput1)
-$button1 = Create-Button -text "Block a IP" -len 40
-$panel2.Controls.Add($button1)
-
-
-# Input 2
-$textBoxInput2 = Create-Text-Box -len 103
-$panel2.Controls.Add($textBoxInput2)
-$button2 = Create-Button -text "Block a IP (CIDR)" -len 133
-$panel2.Controls.Add($button2)
-
-
-# Input 3
-$textBoxInput3 = Create-Text-Box -len 199
-$panel2.Controls.Add($textBoxInput3)
-$button3 = Create-Button -text "Block an domain" -len 229
-$panel2.Controls.Add($button3)
-
-
-# Input 4
-$textBoxInput4 = Create-Text-Box -len 290
-$panel2.Controls.Add($textBoxInput4)
-$button4 = Create-Button -text "Block an email" -len 320
-$panel2.Controls.Add($button4)
-
-$form.Controls.Add($panel2)
-
-
-
-$panel3 = Create-Input-Panel -len 610
-
-# Removal Input 1 (For Column 1)
-$textBoxRemove1 = Create-Text-Box -len 10
-$panel3.Controls.Add($textBoxRemove1)
-$buttonRemove1 = Create-Button -text "Remove IP" -len 40
-$panel3.Controls.Add($buttonRemove1)
-
-
-# Removal Input 2 (For Column 2)
-$textBoxRemove2 = Create-Text-Box -len 199
-$panel3.Controls.Add($textBoxRemove2)
-$buttonRemove2 = Create-Button -text "Remove Domain" -len 229
-$panel3.Controls.Add($buttonRemove2)
-
-
-# Removal Input 3 (For Column 3)
-$textBoxRemove3 = Create-Text-Box -len 290
-$panel3.Controls.Add($textBoxRemove3)
-$buttonRemove3 = Create-Button -text "Remove Email" -len 320
-$panel3.Controls.Add($buttonRemove3)
-
-$form.Controls.Add($panel3)
-
-
-
-
-
-function Handle-ButtonClick {
-    param (
-        [string]$InputText,
-        [scriptblock]$Action,
-        [string]$SuccessMessage
-    )
-
-    if (![string]::IsNullOrWhiteSpace($InputText)) {
-        & $Action
-        [System.Windows.Forms.MessageBox]::Show($SuccessMessage)
-    } elseif ([string]::IsNullOrWhiteSpace($InputText)) {
-        [System.Windows.Forms.MessageBox]::Show("Input is empty")
+function DisplayDomains {
+    $domains = Get-DomainList
+    if ($domains) {
+        $domains | Out-String
     } else {
-        [System.Windows.Forms.MessageBox]::Show("Unknown error")
+        Write-Host "Nenhum domínio bloqueado." -ForegroundColor Yellow
     }
 }
 
 
-
-# Block a single IP
-$button1.Add_Click({
-    $input1 = $textBoxInput1.Text
-    Handle-ButtonClick -InputText $input1 -Action { Add-IPBlockListEntry -IPAddress $input1 | Out-Host } -SuccessMessage "IP '$input1' has been blocked"
-})
-
-# Block IP range
-$button2.Add_Click({
-    $input2 = $textBoxInput2.Text
-    Handle-ButtonClick -InputText $input2 -Action { Add-IPBlockListEntry -IPRange $input2 | Out-Host } -SuccessMessage "IP range '$input2' has been blocked"
-})
-
-# Block domain
-$button3.Add_Click({
-    $input3 = $textBoxInput3.Text
-    Handle-ButtonClick -InputText $input3 -Action { Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Add="$input3"} | Out-Host } -SuccessMessage "Domain '$input3' has been blocked"
-})
-
-# Block email
-$button4.Add_Click({
-    $input4 = $textBoxInput4.Text
-    Handle-ButtonClick -InputText $input4 -Action { Set-SenderFilterConfig -BlockedSenders @{Add="$input4"} } -SuccessMessage "Email '$input4' has been blocked"
-})
-
-# Unblock IP/IP range
-$buttonRemove1.Add_Click({
-    $inputRemove1 = $textBoxRemove1.Text
-    Handle-ButtonClick -InputText $inputRemove1 -Action { 
-        Get-IPBlockListEntry | Where {$_.IPRange -eq $inputRemove1} | Remove-IPBlockListEntry -Confirm:$false | Out-Host
-    } -SuccessMessage "IP '$inputRemove1' has been removed"
-})
-
-# Unblock domain
-$buttonRemove2.Add_Click({
-    $inputRemove2 = $textBoxRemove2.Text
-    Handle-ButtonClick -InputText $inputRemove2 -Action { Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Remove=$inputRemove2} | Out-Host } -SuccessMessage "Domain '$inputRemove2' has been removed"
-})
-
-# Unblock email
-$buttonRemove3.Add_Click({
-    $inputRemove3 = $textBoxRemove3.Text
-    Handle-ButtonClick -InputText $inputRemove3 -Action { Set-SenderFilterConfig -BlockedSenders @{Remove=$inputRemove3} } -SuccessMessage "Email '$inputRemove3' has been removed"
-})
+function DisplayEmails {
+    $emails = Get-EmailList
+    if ($emails) {
+        $emails | Out-String
+    } else {
+        Write-Host "Nenhum e-mail bloqueado." -ForegroundColor Yellow
+    }
+}
 
 
+function DisplayIPs {
+    $ips = Get-IPList
+    if ($ips) {
+        $ips | Out-String
+    } else {
+        Write-Host "Nenhum IP bloqueado." -ForegroundColor Yellow
+    }
+}
 
 
+function Search-Word {
+    $word = Read-NonEmptyInput "Palavra para pesquisar (em IPs, domínios e e-mails)"
+    if ($null -eq $word) { return }
 
-$form.ShowDialog()
+    $domains = Get-DomainList
+    $emails  = Get-EmailList
+    $ips     = Get-IPList
+
+    Write-Host "`n========== RESULTADOS DA BUSCA ==========" -ForegroundColor Cyan
+    $found = $false
+
+    function Write-HighlightedLine($line, $word) {
+        $index = $line.IndexOf($word, [System.StringComparison]::OrdinalIgnoreCase)
+        if ($index -ge 0) {
+            $before = $line.Substring(0, $index)
+            $match = $line.Substring($index, $word.Length)
+            $after = $line.Substring($index + $word.Length)
+            Write-Host $before -NoNewline
+            Write-Host $match -ForegroundColor Green -NoNewline
+            Write-Host $after
+        }
+    }
+
+    if ($domains) {
+        $filtered = $domains | Where-Object { $_ -like "*$word*" }
+        if ($filtered) {
+            $found = $true
+            Write-Host "`nDomínios encontrados:`n" -ForegroundColor Green
+            foreach ($dom in $filtered) {
+                Write-HighlightedLine $dom $word
+            }
+        }
+    }
+
+    if ($emails) {
+        $filtered = $emails | Where-Object { $_ -like "*$word*" }
+        if ($filtered) {
+            $found = $true
+            Write-Host "`nE-mails encontrados:`n" -ForegroundColor Green
+            foreach ($email in $filtered) {
+                Write-HighlightedLine $email $word
+            }
+        }
+    }
+
+    if ($ips) {
+        $filtered = $ips | Where-Object { $_ -like "*$word*" }
+        if ($filtered) {
+            $found = $true
+            Write-Host "`nIPs encontrados:`n" -ForegroundColor Green
+            foreach ($ip in $filtered) {
+                Write-HighlightedLine $ip $word
+            }
+        }
+    }
+
+    if (-not $found) {
+        Write-Host "Nenhum item encontrado contendo '$word'." -ForegroundColor Yellow
+    }
+}
+
+
+function BlockDomain {
+    $value = Read-NonEmptyInput("Domínio para bloquear (Ex: domain.com)")
+    if ($value) {
+        Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Add="$value"} | Out-Host 
+    }
+}
+
+
+function BlockEmail {
+    $value = Read-NonEmptyInput("Email para bloquear (Ex: joao@gmail.com)")
+    if ($value) {
+        Set-SenderFilterConfig -BlockedSenders @{Add="$value"} 
+    }
+}
+
+
+function BlockIP {
+    $value = Read-NonEmptyInput("IP para bloquear (Ex: 192.168.0.100)")
+    if ($value) {
+        Add-IPBlockListEntry -IPAddress $value | Out-Host 
+    }
+}
+
+
+function BlockCIDR {
+    $value = Read-NonEmptyInput("IP/CIDR para bloquear (Ex: 192.168.0.0/24)")
+    if ($value) {
+        Add-IPBlockListEntry -IPRange $value | Out-Host 
+    }
+}
+
+
+function UnblockDomain {
+    $value = Read-NonEmptyInput("Domínio para desbloquear (Ex: domain.com)")
+    if ($value) {
+        Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Remove=$value} | Out-Host 
+    }
+}
+
+
+function UnblockEmail {
+    $value = Read-NonEmptyInput("Email para desbloquear (Ex: joao@gmail.com)")
+    if ($value) {
+        Set-SenderFilterConfig -BlockedSenders @{Remove="$value"}
+    }
+}
+
+
+function UnblockIP {
+    $value = Read-NonEmptyInput("IP para desbloquear (Ex: 192.168.0.100)")
+    if ($value) {
+        Get-IPBlockListEntry | Where-Object {$_.IPRange -eq $value} | Remove-IPBlockListEntry -Confirm:$false | Out-Host
+    }
+}
+
+
+function AnalyzeSubdomains {
+    $domains = Get-DomainList
+    if (-not $domains) {
+        Write-Host "Nenhum domínio bloqueado para analisar." -ForegroundColor Yellow
+        return
+    }
+
+    $minInput = Read-NonEmptyInput "Mínimo de ocorrências para exibir"
+    if ($null -eq $minInput) { return }
+    try {
+        $min = [int]$minInput
+    } catch {
+        Write-Host "Valor inválido. Digite um número inteiro." -ForegroundColor Red
+        return
+    }
+
+    $ignoreInput = Read-Host "Subdomínios para ignorar (separados por vírgula, ex: com,net,org)"
+    $ignore = @()
+    if ($ignoreInput) {
+        $ignore = $ignoreInput.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }
+    }
+
+    $subCount = @{}
+    $subDomains = @{}
+
+    foreach ($domain in $domains) {
+        $parts = $domain.Split('.')
+        foreach ($part in $parts) {
+            if ($part -in $ignore) { continue }
+            if (-not $subCount.ContainsKey($part)) {
+                $subCount[$part] = 0
+                $subDomains[$part] = [System.Collections.Generic.List[string]]::new()
+            }
+            $subCount[$part]++
+            $subDomains[$part].Add($domain)
+        }
+    }
+
+    $sorted = $subCount.GetEnumerator() | Sort-Object Value -Descending
+
+    Write-Host "`n--- Análise de Subdomínios ---" -ForegroundColor Cyan
+    $found = $false
+    foreach ($entry in $sorted) {
+        $sub = $entry.Key
+        $freq = $entry.Value
+        if ($freq -ge $min) {
+            $found = $true
+            Write-Host "`n# Subdomínio: $sub -> $freq`n" -ForegroundColor Green
+            $domainsList = $subDomains[$sub]
+            foreach ($dom in $domainsList) {
+                $parts = $dom.Split('.')
+                Write-Host "  |-> " -NoNewline
+                for ($i = 0; $i -lt $parts.Count; $i++) {
+                    if ($parts[$i] -eq $sub) {
+                        Write-Host $parts[$i] -ForegroundColor Green -NoNewline
+                    } else {
+                        Write-Host $parts[$i] -NoNewline
+                    }
+                    if ($i -lt $parts.Count - 1) {
+                        Write-Host "." -NoNewline
+                    }
+                }
+                Write-Host ""
+            }
+            Write-Host ""
+        }
+    }
+    if (-not $found) {
+        Write-Host "Nenhum subdomínio atinge o mínimo de $min ocorrências." -ForegroundColor Yellow
+    }
+    Write-Host "Total de domínios analisados: $($domains.Count)" -ForegroundColor Cyan
+}
+
+
+function Write-MenuOption {
+    param(
+        [string]$Number,
+        [string]$Text
+    )
+    $prefix = "{0,-4}" -f "$Number."
+    Write-Host $prefix -NoNewline -ForegroundColor DarkYellow
+    Write-Host $Text
+}
+
+
+$blockDom     = "1"
+$blockEmail   = "2"
+$blockIP      = "3"
+$blockCIDR    = "4"
+$unblockDom   = "5"
+$unblockEmail = "6"
+$unblockIP    = "7"
+$seeDoms      = "8"
+$seeEmails    = "9"
+$seeIPs       = "10"
+$look4Word    = "11"
+$analyze      = "12"
+
+
+while ($true) {       
+    Write-Host "`n============= Menu ==============" -ForegroundColor Cyan
+
+    Write-MenuOption $blockDom "Bloquear domínio"
+    Write-MenuOption $blockEmail "Bloquear email"
+    Write-MenuOption $blockIP "Bloquear IP"
+    Write-MenuOption $blockCIDR "Bloquear IP (CIDR)"
+    Write-MenuOption $unblockDom "Desbloquear domínio"
+    Write-MenuOption $unblockEmail "Desbloquear email"
+    Write-MenuOption $unblockIP "Desbloquear IP"
+    Write-MenuOption $seeDoms "Ver domínios bloqueados"
+    Write-MenuOption $seeEmails "Ver emails bloqueados"
+    Write-MenuOption $seeIPs "Ver IPs bloqueados"
+    Write-MenuOption $look4Word "Procurar por palavra"
+    Write-MenuOption $analyze "Contagem de subdomínios"
+
+    $option = Read-Host "`nOpção"
+
+    switch ($option) {
+        $blockDom     { BlockDomain        }
+        $blockEmail   { BlockEmail         }
+        $blockIP      { BlockIP            }
+        $blockCIDR    { BlockCIDR          }
+        $unblockDom   { UnblockDomain      }
+        $unblockEmail { UnblockEmail       }
+        $unblockIP    { UnblockIP          }
+        $seeDoms      { DisplayDomains     }
+        $seeEmails    { DisplayEmails      }
+        $seeIPs       { DisplayIPs         }
+        $look4Word    { Search-Word        }
+        $analyze      { AnalyzeSubdomains }
+
+        Default {
+            Write-Host "Opção inválida!" -ForegroundColor Red
+        }
+    }
+
+    Read-Host "`nPressione Enter para continuar"
+}
