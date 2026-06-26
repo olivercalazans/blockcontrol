@@ -60,7 +60,7 @@ function DisplayIPs {
 }
 
 
-function Search-Word {
+function SearchWord {
     $word = Read-NonEmptyInput "Palavra para pesquisar (em IPs, domínios e e-mails)"
     if ($null -eq $word) { return }
 
@@ -276,24 +276,86 @@ $seeIPs       = "10"
 $look4Word    = "11"
 $analyze      = "12"
 
+$menuOptions = @(
+    "Bloquear domínio",
+    "Bloquear email",
+    "Bloquear IP",
+    "Bloquear IP (CIDR)",
+    "Desbloquear domínio",
+    "Desbloquear email",
+    "Desbloquear IP",
+    "Ver domínios bloqueados",
+    "Ver emails bloqueados",
+    "Ver IPs bloqueados",
+    "Procurar por palavra",
+    "Contagem de subdomínios"
+)
+
+
+
+function ShowSafeArrowMenu {
+    param (
+        [string[]]$Options,
+        [string]$Title = "============= Menu =============="
+    )
+
+    $selectedIndex = 0
+    $isRunning = $true
+
+    [Console]::CursorVisible = $false
+    Write-Host "`n$Title" -ForegroundColor Cyan    
+    $menuStartRow = [Console]::CursorTop
+
+    for ($i = 0; $i -lt $Options.Length; $i++) {
+        if ($i -eq $selectedIndex) {
+            Write-Host (" > [ $($Options[$i]) ] ").PadRight(40) -ForegroundColor Yellow -BackgroundColor DarkCyan
+        } else {
+            Write-Host ("   $($Options[$i]) ").PadRight(40)
+        }
+    }
+
+    while ($isRunning) {
+        $keyInfo = [Console]::ReadKey($true)
+
+        switch ($keyInfo.Key) {
+            'UpArrow' {
+                $selectedIndex--
+                if ($selectedIndex -lt 0) { $selectedIndex = $Options.Length - 1 }
+            }
+            'DownArrow' {
+                $selectedIndex++
+                if ($selectedIndex -ge $Options.Length) { $selectedIndex = 0 }
+            }
+            'Enter' {
+                $isRunning = $false
+                continue
+            }
+            default { continue }
+        }
+
+        [Console]::SetCursorPosition(0, $menuStartRow)
+
+        for ($i = 0; $i -lt $Options.Length; $i++) {
+            if ($i -eq $selectedIndex) {
+                Write-Host (" > [ $($Options[$i]) ] ").PadRight(40) -ForegroundColor Yellow -BackgroundColor DarkCyan
+            } else {
+                Write-Host ("   $($Options[$i]) ").PadRight(40)
+            }
+        }
+    }
+
+    [Console]::CursorVisible = $true
+    
+    return ($selectedIndex + 1).ToString()
+}
+
 
 while ($true) {       
-    Write-Host "`n============= Menu ==============" -ForegroundColor Cyan
+    
+    $option = Show-SafeArrowMenu -Options $menuOptions -Title "============= Menu =============="
 
-    Write-MenuOption $blockDom "Bloquear domínio"
-    Write-MenuOption $blockEmail "Bloquear email"
-    Write-MenuOption $blockIP "Bloquear IP"
-    Write-MenuOption $blockCIDR "Bloquear IP (CIDR)"
-    Write-MenuOption $unblockDom "Desbloquear domínio"
-    Write-MenuOption $unblockEmail "Desbloquear email"
-    Write-MenuOption $unblockIP "Desbloquear IP"
-    Write-MenuOption $seeDoms "Ver domínios bloqueados"
-    Write-MenuOption $seeEmails "Ver emails bloqueados"
-    Write-MenuOption $seeIPs "Ver IPs bloqueados"
-    Write-MenuOption $look4Word "Procurar por palavra"
-    Write-MenuOption $analyze "Contagem de subdomínios"
-
-    $option = Read-Host "`nOpção"
+    Write-Host "`n[Running selected option...]" -ForegroundColor Gray
+    Write-Host "----------------------------------"
 
     switch ($option) {
         $blockDom     { BlockDomain        }
@@ -306,11 +368,11 @@ while ($true) {
         $seeDoms      { DisplayDomains     }
         $seeEmails    { DisplayEmails      }
         $seeIPs       { DisplayIPs         }
-        $look4Word    { Search-Word        }
-        $analyze      { AnalyzeSubdomains }
+        $look4Word    { SearchWord         }
+        $analyze      { AnalyzeSubdomains  }
 
         Default {
-            Write-Host "Opção inválida!" -ForegroundColor Red
+            Write-Host "Invalid option!" -ForegroundColor Red
         }
     }
 
