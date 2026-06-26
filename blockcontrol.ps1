@@ -352,7 +352,7 @@ function ShowSafeArrowMenu {
 
 while ($true) {       
     
-    $option = Show-SafeArrowMenu -Options $menuOptions -Title "============= Menu =============="
+    $option = ShowSafeArrowMenu -Options $menuOptions -Title "============= Menu =============="
 
     Write-Host "`n[Running selected option...]" -ForegroundColor Gray
     Write-Host "----------------------------------"
