@@ -1,18 +1,22 @@
 Write-Host "`n# Repositório: https://github.com/olivercalazans/blockcontrol"
 Write-Host "A primeira execução é lenta pois o Exchange está iniciando o terminal" -ForegroundColor Green
 
-function Read-NonEmptyInput {
+function ReadNonEmptyInput {
     param ( [string]$Message )
 
-    $inputValue = Read-Host $Message
+    Add-Type -AssemblyName Microsoft.VisualBasic
+    
+    $inputValue = [Microsoft.VisualBasic.Interaction]::InputBox($Message, "BlockControl Input", "")
     
     if ([string]::IsNullOrWhiteSpace($inputValue)) {
-        Write-Host "Entrada vazía" -ForegroundColor Red
+        Write-Host "Entrada vazia ou cancelada." -ForegroundColor Red
         return $null
     }
     
-    return $inputValue
+    return $inputValue.Trim()
 }
+
+
 
 function Get-DomainList {
     Get-SenderFilterConfig |
@@ -61,7 +65,7 @@ function DisplayIPs {
 
 
 function SearchWord {
-    $word = Read-NonEmptyInput "Palavra para pesquisar (em IPs, domínios e e-mails)"
+    $word = ReadNonEmptyInput "Palavra para pesquisar (em IPs, domínios e e-mails)"
     if ($null -eq $word) { return }
 
     $domains = Get-DomainList
@@ -123,7 +127,7 @@ function SearchWord {
 
 
 function BlockDomain {
-    $value = Read-NonEmptyInput("Domínio para bloquear (Ex: domain.com)")
+    $value = ReadNonEmptyInput("Domínio para bloquear (Ex: domain.com)")
     if ($value) {
         Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Add="$value"} | Out-Host 
     }
@@ -131,7 +135,7 @@ function BlockDomain {
 
 
 function BlockEmail {
-    $value = Read-NonEmptyInput("Email para bloquear (Ex: joao@gmail.com)")
+    $value = ReadNonEmptyInput("Email para bloquear (Ex: joao@gmail.com)")
     if ($value) {
         Set-SenderFilterConfig -BlockedSenders @{Add="$value"} 
     }
@@ -139,7 +143,7 @@ function BlockEmail {
 
 
 function BlockIP {
-    $value = Read-NonEmptyInput("IP para bloquear (Ex: 192.168.0.100)")
+    $value = ReadNonEmptyInput("IP para bloquear (Ex: 192.168.0.100)")
     if ($value) {
         Add-IPBlockListEntry -IPAddress $value | Out-Host 
     }
@@ -147,7 +151,7 @@ function BlockIP {
 
 
 function BlockCIDR {
-    $value = Read-NonEmptyInput("IP/CIDR para bloquear (Ex: 192.168.0.0/24)")
+    $value = ReadNonEmptyInput("IP/CIDR para bloquear (Ex: 192.168.0.0/24)")
     if ($value) {
         Add-IPBlockListEntry -IPRange $value | Out-Host 
     }
@@ -155,7 +159,7 @@ function BlockCIDR {
 
 
 function UnblockDomain {
-    $value = Read-NonEmptyInput("Domínio para desbloquear (Ex: domain.com)")
+    $value = ReadNonEmptyInput("Domínio para desbloquear (Ex: domain.com)")
     if ($value) {
         Set-SenderFilterConfig -BlockedDomainsAndSubdomains @{Remove=$value} | Out-Host 
     }
@@ -163,7 +167,7 @@ function UnblockDomain {
 
 
 function UnblockEmail {
-    $value = Read-NonEmptyInput("Email para desbloquear (Ex: joao@gmail.com)")
+    $value = ReadNonEmptyInput("Email para desbloquear (Ex: joao@gmail.com)")
     if ($value) {
         Set-SenderFilterConfig -BlockedSenders @{Remove="$value"}
     }
@@ -171,7 +175,7 @@ function UnblockEmail {
 
 
 function UnblockIP {
-    $value = Read-NonEmptyInput("IP para desbloquear (Ex: 192.168.0.100)")
+    $value = ReadNonEmptyInput("IP para desbloquear (Ex: 192.168.0.100)")
     if ($value) {
         Get-IPBlockListEntry | Where-Object {$_.IPRange -eq $value} | Remove-IPBlockListEntry -Confirm:$false | Out-Host
     }
@@ -185,7 +189,7 @@ function AnalyzeSubdomains {
         return
     }
 
-    $minInput = Read-NonEmptyInput "Mínimo de ocorrências para exibir"
+    $minInput = ReadNonEmptyInput "Mínimo de ocorrências para exibir"
     if ($null -eq $minInput) { return }
     try {
         $min = [int]$minInput
